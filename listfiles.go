@@ -8,11 +8,15 @@ import (
 )
 
 func main() {
-	dirPath := "./"
+	if len(os.Args) < 2 {
+		log.Fatalf("Usage: %s <directory-path>", os.Args[0])
+	}
+
+	dirPath := os.Args[1]
 
 	entries, err := os.ReadDir(dirPath)
 	if err != nil {
-		log.Fatalf("Error: %v", err)
+		log.Fatalf("Error reading directory: %v", err)
 	}
 
 	for _, entry := range entries {
