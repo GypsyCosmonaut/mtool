@@ -43,23 +43,25 @@ func generatePublicIP() string {
 
 // Check if an IP is private.
 func isPrivate(ip string) bool {
-	privateCIDRs := []string{
-		"10.", "192.168.",
+	var a, b, c, d int
+	_, err := fmt.Sscanf(ip, "%d.%d.%d.%d", &a, &b, &c, &d)
+	if err != nil {
+		return false // not IPv4
 	}
 
-	for _, p := range privateCIDRs {
-		if ip[:len(p)] == p {
-			return true
-		}
+	// 10.0.0.0/8
+	if a == 10 {
+		return true
 	}
 
-	// Check 172.16.0.0 – 172.31.255.255
-	if ip[:3] == "172" {
-		var a, b, c, d int
-		fmt.Sscanf(ip, "%d.%d.%d.%d", &a, &b, &c, &d)
-		if a == 172 && b >= 16 && b <= 31 {
-			return true
-		}
+	// 192.168.0.0/16
+	if a == 192 && b == 168 {
+		return true
+	}
+
+	// 172.16.0.0/12  → b must be 16–31
+	if a == 172 && (b >= 16 && b <= 31) {
+		return true
 	}
 
 	return false
